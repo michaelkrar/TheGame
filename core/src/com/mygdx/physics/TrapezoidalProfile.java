@@ -10,6 +10,8 @@ public class TrapezoidalProfile {
     private ShapeState mShapeState;
     private double mRisingDeltaX;
     private double mRisenState;
+    private double currVel;
+    private double currPos;
     public TrapezoidalProfile (double maxAccel, double maxVel, double initialState, double finalState, Dimension dim) {
         this.maxAccel = maxAccel;
         this.maxVel = maxVel;
@@ -19,6 +21,7 @@ public class TrapezoidalProfile {
         mShapeState = ShapeState.RISE;
         mRisingDeltaX=0;
         mRisenState = 0;
+        currVel = 0;
     }
     public double getAccel (LinearKinematics lk) {
             // if (lk.velocity().x()<maxVel) {
@@ -26,18 +29,25 @@ public class TrapezoidalProfile {
             // } else {
             //     return 0;
             // }
+            if(dim==Dimension.X) {
+                currVel = lk.velocity().x();
+                currPos = lk.position().x();
+            } else {
+                currVel = lk.velocity().y();
+                currPos = lk.position().y();
+            }
             switch(mShapeState) {
                 case RISE:
-                    if(lk.velocity().x()>maxVel){
+                    if(currVel>maxVel){
                         mShapeState = ShapeState.STEADY;
-                        mRisenState = lk.position().x();
+                        mRisenState = currPos;
                         mRisingDeltaX = mRisenState - initialState;
                     }
                     return maxAccel;
                 case FALL:
                     return -maxAccel;
                 case STEADY:
-                    if ((lk.position().x()-mRisenState)+2*mRisingDeltaX>finalState-initialState) {
+                    if ((currPos-mRisenState)+2*mRisingDeltaX>finalState-initialState) {
                         mShapeState = ShapeState.FALL;
                     }
                     return 0;
@@ -48,7 +58,7 @@ public class TrapezoidalProfile {
     }
 
     public boolean isFinished (LinearKinematics lk) {
-        if(Math.abs(lk.position().x()-finalState)<errorAccept){
+        if(Math.abs(currPos-finalState)<errorAccept){
             mShapeState = ShapeState.DEAD;
             return true;
         }

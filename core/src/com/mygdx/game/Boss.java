@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -22,6 +24,9 @@ public class Boss extends Entity {
     private TrapezoidalProfile mProfile;
     private boolean startedProfile;
     private double setpoint;
+    public ArrayList<Bullet> bullets;
+    private long timeLastBulletFired;
+    private boolean skyphase;
     // public ShapeRenderer barDrawer;
     public Boss (Translation2d pose) {
         texture = new Texture("boss.png");
@@ -35,6 +40,9 @@ public class Boss extends Entity {
         mLK = new LinearKinematics(pose);
         mProfile = new TrapezoidalProfile(0, 0, 0,0, Dimension.X);
         setpoint = 250;
+        bullets = new ArrayList<Bullet>();
+        timeLastBulletFired=0;
+        skyphase= false;
         // barDrawer = new ShapeRenderer();
     }
     public void update () {
@@ -44,7 +52,13 @@ public class Boss extends Entity {
             hp-=dmg;
             timeLastHit= TimeUtils.millis();
             setpoint = 100;
-            mFightState = FightState.GROUNDRUSH;
+            mFightState = FightState.GETHIGH;
+        }
+    }
+    private void fireBullet () {
+        if(bullets.size()<10&&TimeUtils.timeSinceMillis(timeLastBulletFired)>200){
+            bullets.add(new Bullet(pose));
+            timeLastBulletFired=TimeUtils.millis();
         }
     }
     public void render (SpriteBatch batch) {
@@ -76,10 +90,42 @@ public class Boss extends Entity {
                     mLK.setVelocity(new Translation2d(0,0));
                     mLK.setAcceleration(new Translation2d(0,0));
                     startedProfile = false;
-                    mFightState = FightState.SKY;
+                    mFightState = FightState.UNKNOWN;
                 }
                 break;
+            case GETHIGH:
+                setpoint = 350;
+                if(!startedProfile) {
+                        System.out.println("started profile i have not");
+                        mProfile = new TrapezoidalProfile(10, 30, mLK.position().y(), setpoint, Dimension.Y);
+                        startedProfile = true;
+                    } else if(!mProfile.isFinished(mLK)){
+                        System.out.println("i havent finished");
+                        mLK.setAcceleration(new Translation2d(0,mProfile.getAccel(mLK)));
+                    } else {
+                        mLK.setVelocity(new Translation2d(0,0));
+                        mLK.setAcceleration(new Translation2d(0,0));
+                        startedProfile = false;
+                        mFightState = FightState.SKY;
+                    }
+                break;
             case SKY:
+                setpoint = skyphase?50:400;
+                if(!startedProfile) {
+                        System.out.println("started profile i have not");
+                        mProfile = new TrapezoidalProfile(10, 30, mLK.position().y(), setpoint, Dimension.X);
+                        startedProfile = true;
+                    } else if(!mProfile.isFinished(mLK)){
+                        System.out.println("i havent finished");
+                        mLK.setAcceleration(new Translation2d(mProfile.getAccel(mLK),0));
+                    } else {
+                        mLK.setVelocity(new Translation2d(0,0));
+                        mLK.setAcceleration(new Translation2d(0,0));
+                        startedProfile = false;
+                        mFightState = FightState.SKY;
+                        skyphase=skyphase?false:true;
+                    }
+                    fireBullet();
                 break;
             case UNKNOWN:
                 break;
@@ -98,6 +144,7 @@ public class Boss extends Entity {
 
     public enum FightState {
         SKY,
+        GETHIGH,
         GROUNDRUSH,
         UNKNOWN,
         DEAD,
