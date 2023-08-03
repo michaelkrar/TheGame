@@ -29,18 +29,19 @@ public class TheGame extends ApplicationAdapter {
 		ScreenUtils.clear(0, 0, 1, 1);
 		batch.begin();
 		player.update();
-		playMusic();
+		// playMusic();
 		for (int i = 0; i<40; i++) {
 			batch.draw(grass,16*i,16);
 		}
-		batch.draw(img, (float)player.linK.position().x(), (float)player.linK.position().y());
+		// batch.draw(img, (float)player.linK.position().x(), (float)player.linK.position().y());
+		player.render(batch);
 		batch.end();
 	}
 
 	public void playMusic () {
 		Music menuMusic = Gdx.audio.newMusic(Gdx.files.internal("song.ogg"));
-menuMusic.setLooping(true);
-menuMusic.play();
+		menuMusic.setLooping(true);
+		menuMusic.play();
 	}
 	
 	@Override
