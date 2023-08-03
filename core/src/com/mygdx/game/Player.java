@@ -12,14 +12,14 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
-import com.mygdx.game.KeyHandler;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
+
 
 public class Player extends Entity {
     
-    KeyHandler keyH;
 
-    public Player (KeyHandler keyH) {
-        this.keyH = keyH;
+    public Player () {
         setDefaultValues();
     }
 
@@ -31,18 +31,18 @@ public class Player extends Entity {
 
 
     public void update () {
-        // if(keyH.upPressed == true ) {            
+        if(Gdx.input.isKeyPressed(Keys.W)) {            
+            y += speed;
+        }
+        if(Gdx.input.isKeyPressed(Keys.A)) {            
+            x -= speed;
+        }
+        if(Gdx.input.isKeyPressed(Keys.S)) {            
             y -= speed;
-        // }
-        // if(keyH.downPressed == true ) {
-        //     y += speed;
-        // }
-        // if(keyH.leftPressed == true ) {
-        //     x -= speed;
-        // }
-        // if(keyH.rightPressed == true ) {
-        //     x += speed;
-        // }
+        }
+        if(Gdx.input.isKeyPressed(Keys.D)) {            
+            x += speed;
+        }
     }
 
     
