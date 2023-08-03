@@ -15,8 +15,10 @@ import javax.imageio.ImageIO;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mygdx.physics.LinearKinematics;
 import com.mygdx.physics.Translation2d;
 
@@ -26,6 +28,7 @@ public class Player extends Entity {
     public LinearKinematics linK;
 
     private RenderState mRenderState;
+    private Face mFace;
 
     public Player () {
         setDefaultValues();
@@ -40,20 +43,26 @@ public class Player extends Entity {
         linK = new LinearKinematics(pose);
         texture = new Texture("walmartio.png");
         mRenderState = RenderState.STILL;
+        mFace = Face.RIGHT;
+        sprite = new Sprite(texture, (int)pose.x(), (int)pose.y(), 16, 16);
     }
 
 
     public void update () {
         System.out.println(linK.position().x() + "," + linK.position().y() + " and " + linK.velocity().y() + linK.acceleration().y());
         linK.loop(.1);
+        sprite.setPosition((float)pose.x(), (float)pose.y());
+        sprite.setTexture(texture);
         updateRenderState();
   
 
             if(Gdx.input.isKeyPressed(Keys.A)) {            
                 linK.position().setX(linK.position().x()-speed);
+                mFace = Face.LEFT;
             }
             if(Gdx.input.isKeyPressed(Keys.D)) {            
                 linK.position().setX(linK.position().x()+speed);
+                mFace = Face.RIGHT;
             }
             //falling
             if(linK.position().y()>32) {
@@ -92,14 +101,26 @@ public class Player extends Entity {
                 break;
 
         }
+        sprite.setTexture(texture);
+        if(mFace==Face.LEFT){
+            sprite.flip(true, false);
+        } else {
+            sprite.flip(false,false);        
+        }
 
-		batch.draw(texture, (float)linK.position().x(), (float)linK.position().y());
+		// batch.draw(texture, (float)linK.position().x(), (float)linK.position().y());
+        sprite.draw(batch);
     }
 
     public enum RenderState {
         STILL,
         JUMP,
-        FALL
+        FALL,
+    }
+
+    public enum Face {
+        LEFT,
+        RIGHT,
     }
     
 }
