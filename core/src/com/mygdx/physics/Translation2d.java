@@ -21,6 +21,13 @@ public class Translation2d {
         return y;
     }
 
+    public void setX (double newX) {
+        x = newX;
+    }
+    public void setY (double newY) {
+        y = newY;
+    }
+
     public double theta() {
         return Math.atan(y/x);
     }

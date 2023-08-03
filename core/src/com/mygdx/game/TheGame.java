@@ -13,21 +13,27 @@ public class TheGame extends ApplicationAdapter {
 	Texture img;
 	Player player;
 	Audio audio;
+	Texture grass;
 	
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("mario.png");
+		img = new Texture("walmartio.png");
+		grass = new Texture("grassblock.png");
 		player = new Player();
+		Gdx.graphics.setWindowedMode(256,256);
 	}
 
 	@Override
 	public void render () {
-		ScreenUtils.clear(1, 0, 0, 1);
+		ScreenUtils.clear(0, 0, 1, 1);
 		batch.begin();
 		player.update();
 		playMusic();
-		batch.draw(img, player.x, player.y);
+		for (int i = 0; i<40; i++) {
+			batch.draw(grass,16*i,16);
+		}
+		batch.draw(img, (float)player.linK.position().x(), (float)player.linK.position().y());
 		batch.end();
 	}
 
