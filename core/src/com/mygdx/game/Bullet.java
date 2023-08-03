@@ -25,7 +25,7 @@ public class Bullet extends Entity {
         batch.draw(texture, (float)linK.position().x(), (float)linK.position().y());
     }
     public boolean dead () {
-        System.out.println(Math.abs(initX-pose.x()));
+        // System.out.println(Math.abs(initX-pose.x()));
         return Math.abs(initX-linK.position().x())>500;
     }
 }

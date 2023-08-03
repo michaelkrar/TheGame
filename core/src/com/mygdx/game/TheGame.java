@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -37,7 +38,8 @@ public class TheGame extends ApplicationAdapter {
 	public void render () {
 		ScreenUtils.clear(0, 0, 1, 1);
 		barDrawer.begin(ShapeType.Filled); //I'm using the Filled ShapeType, but remember you have three of them 
-	            barDrawer.rect((float)bowser.pose.x(),(float)bowser.pose.y()+32,(float).3*bowser.hp,(float)3); //assuming you have created those x, y, width and height variables 
+		barDrawer.setColor(Color.RED);
+	            barDrawer.rect((float)bowser.mLK.position().x(),(float)bowser.mLK.position().y()+32,(float).3*bowser.hp,(float)3); //assuming you have created those x, y, width and height variables 
 	            barDrawer.end(); 
 		batch.begin();
 		player.update();
@@ -49,7 +51,7 @@ public class TheGame extends ApplicationAdapter {
 		player.render(batch);
 		bowser.render(batch);
 		damageChecker(player,bowser);
-		System.out.println(bowser.hp);
+		// System.out.println(bowser.hp);
 		// font.draw(batch,bowser.hp + "/" + bowser.hpMax, 10,10);
 		batch.end();
 	}
@@ -62,7 +64,7 @@ public class TheGame extends ApplicationAdapter {
 	
 	public void damageChecker (Player player, Boss boss) {
 		for (Bullet b : player.bullets) {
-			if (boss.pose.subtract(b.linK.position()).hypot()<20){
+			if (boss.mLK.position().subtract(b.linK.position()).hypot()<20){
 				boss.damage(10);
 			}
 		}
