@@ -5,8 +5,12 @@ import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.mygdx.physics.Translation2d;
 
 public class TheGame extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -14,6 +18,9 @@ public class TheGame extends ApplicationAdapter {
 	Player player;
 	Audio audio;
 	Texture grass;
+	Boss bowser;
+	ShapeRenderer barDrawer;
+	// BitmapFont font = new BitmapFont();
 	
 	@Override
 	public void create () {
@@ -22,11 +29,16 @@ public class TheGame extends ApplicationAdapter {
 		grass = new Texture("grassblock.png");
 		player = new Player();
 		Gdx.graphics.setWindowedMode(256,256);
+		bowser = new Boss(new Translation2d(200,30));
+		barDrawer = new ShapeRenderer();
 	}
 
 	@Override
 	public void render () {
 		ScreenUtils.clear(0, 0, 1, 1);
+		barDrawer.begin(ShapeType.Filled); //I'm using the Filled ShapeType, but remember you have three of them 
+	            barDrawer.rect((float)bowser.pose.x(),(float)bowser.pose.y()+32,(float).3*bowser.hp,(float)3); //assuming you have created those x, y, width and height variables 
+	            barDrawer.end(); 
 		batch.begin();
 		player.update();
 		// playMusic();
@@ -35,6 +47,10 @@ public class TheGame extends ApplicationAdapter {
 		}
 		// batch.draw(img, (float)player.linK.position().x(), (float)player.linK.position().y());
 		player.render(batch);
+		bowser.render(batch);
+		damageChecker(player,bowser);
+		System.out.println(bowser.hp);
+		// font.draw(batch,bowser.hp + "/" + bowser.hpMax, 10,10);
 		batch.end();
 	}
 
@@ -44,9 +60,18 @@ public class TheGame extends ApplicationAdapter {
 		menuMusic.play();
 	}
 	
+	public void damageChecker (Player player, Boss boss) {
+		for (Bullet b : player.bullets) {
+			if (boss.pose.subtract(b.linK.position()).hypot()<20){
+				boss.damage(10);
+			}
+		}
+	}
 	@Override
 	public void dispose () {
 		batch.dispose();
+		player.dispose();
 		img.dispose();
+		barDrawer.dispose();
 	}
 }
