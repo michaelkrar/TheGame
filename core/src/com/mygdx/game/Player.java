@@ -21,6 +21,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.Boss.FightState;
+import com.mygdx.game.Boss.ImmuneState;
 import com.mygdx.physics.LinearKinematics;
 import com.mygdx.physics.Translation2d;
 
@@ -35,6 +37,10 @@ public class Player extends Entity {
     public ArrayList<Bullet> bullets;
     private long timeLastBulletFired;
     private Texture gun;
+    public int hp;
+    private ImmuneState mImmuneState;
+    public long timeLastHit;
+
 
     public Player () {
         setDefaultValues();
@@ -55,9 +61,33 @@ public class Player extends Entity {
         bullets = new ArrayList<Bullet>();
         timeLastBulletFired=TimeUtils.millis();
         gun = new Texture("gun.png");
+        hp = 100;
+        mImmuneState = ImmuneState.NONE;
+        timeLastHit = 0;
+    }
+
+    private void updateStates () {
+        if(TimeUtils.timeSinceMillis(timeLastHit) > 1000) {
+            mImmuneState = ImmuneState.NONE;
+        } else {
+            mImmuneState = ImmuneState.ALL;
+        }
+    }
+
+
+    public void damage(int dmg) {
+        if(mImmuneState==ImmuneState.NONE){
+            hp-=dmg;
+            timeLastHit= TimeUtils.millis();
+        }
+    }
+    public enum ImmuneState {
+        ALL,
+        NONE,
     }
 
     public void update () {
+        updateStates();
         // System.out.println(linK.position().x() + "," + linK.position().y() + " and " + linK.velocity().y() + linK.acceleration().y());
         linK.loop(.1);
         // System.out.println(TimeUtils.timeSinceMillis(timeLastBulletFired));

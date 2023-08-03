@@ -40,6 +40,7 @@ public class TheGame extends ApplicationAdapter {
 		barDrawer.begin(ShapeType.Filled); //I'm using the Filled ShapeType, but remember you have three of them 
 		barDrawer.setColor(Color.RED);
 	            barDrawer.rect((float)bowser.mLK.position().x(),(float)bowser.mLK.position().y()+32,(float).3*bowser.hp,(float)3); //assuming you have created those x, y, width and height variables 
+			    barDrawer.rect((float)player.linK.position().x(),(float)player.linK.position().y()+32,(float).3*player.hp,(float)3); //assuming you have created those x, y, width and height variables 
 	            barDrawer.end(); 
 		batch.begin();
 		player.update();
@@ -67,6 +68,9 @@ public class TheGame extends ApplicationAdapter {
 			if (boss.mLK.position().subtract(b.linK.position()).hypot()<20){
 				boss.damage(10);
 			}
+		}
+		if(boss.mLK.position().subtract(player.linK.position()).hypot()<20){
+			player.damage(10);
 		}
 	}
 	@Override
