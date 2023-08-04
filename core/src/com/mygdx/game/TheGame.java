@@ -16,7 +16,7 @@ import com.mygdx.physics.Translation2d;
 public class TheGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
-	Player player;
+	Player mPlayer;
 	Audio audio;
 	Texture grass;
 	Boss bowser;
@@ -28,8 +28,8 @@ public class TheGame extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		img = new Texture("walmartio.png");
 		grass = new Texture("grassblock.png");
-		player = new Player();
 		Gdx.graphics.setWindowedMode(256,256);
+		mPlayer = Player.getInstance();
 		bowser = new Boss(new Translation2d(200,30));
 		barDrawer = new ShapeRenderer();
 	}
@@ -40,18 +40,18 @@ public class TheGame extends ApplicationAdapter {
 		barDrawer.begin(ShapeType.Filled); //I'm using the Filled ShapeType, but remember you have three of them 
 		barDrawer.setColor(Color.RED);
 	            barDrawer.rect((float)bowser.mLK.position().x(),(float)bowser.mLK.position().y()+32,(float).3*bowser.hp,(float)3); //assuming you have created those x, y, width and height variables 
-			    barDrawer.rect((float)player.linK.position().x(),(float)player.linK.position().y()+32,(float).3*player.hp,(float)3); //assuming you have created those x, y, width and height variables 
+			    barDrawer.rect((float)mPlayer.linK.position().x(),(float)mPlayer.linK.position().y()+32,(float).3*mPlayer.hp,(float)3); //assuming you have created those x, y, width and height variables 
 	            barDrawer.end(); 
 		batch.begin();
-		player.update();
+		mPlayer.update();
 		// playMusic();
 		for (int i = 0; i<40; i++) {
 			batch.draw(grass,16*i,16);
 		}
 		// batch.draw(img, (float)player.linK.position().x(), (float)player.linK.position().y());
-		player.render(batch);
+		mPlayer.render(batch);
 		bowser.render(batch);
-		damageChecker(player,bowser);
+		damageChecker(mPlayer,bowser);
 		// System.out.println(bowser.hp);
 		// font.draw(batch,bowser.hp + "/" + bowser.hpMax, 10,10);
 		batch.end();
@@ -81,7 +81,7 @@ public class TheGame extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		batch.dispose();
-		player.dispose();
+		mPlayer.dispose();
 		img.dispose();
 		barDrawer.dispose();
 	}

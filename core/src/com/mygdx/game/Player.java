@@ -41,9 +41,13 @@ public class Player extends Entity {
     private ImmuneState mImmuneState;
     public long timeLastHit;
 
+    private static final Player mInstance = new Player();
 
-    public Player () {
+    private Player () {
         setDefaultValues();
+    }
+    public static Player getInstance () {
+        return mInstance;
     }
 
     public void setDefaultValues () {
