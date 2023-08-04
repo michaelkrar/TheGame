@@ -12,7 +12,7 @@ public class TrapezoidalProfile {
     private double mRisenState;
     private double currVel;
     private double currPos;
-    private boolean right;
+    private boolean positive;
     public TrapezoidalProfile (double maxAccel, double maxVel, double initialState, double finalState, Dimension dim) {
         this.maxAccel = maxAccel;
         this.maxVel = maxVel;
@@ -23,7 +23,7 @@ public class TrapezoidalProfile {
         mRisingDeltaX=0;
         mRisenState = 0;
         currVel = 0;
-        right = finalState-initialState>0?true:false;
+        positive = finalState-initialState>0?true:false;
     }
     public double getAccel (LinearKinematics lk) {
             // if (lk.velocity().x()<maxVel) {
@@ -45,9 +45,9 @@ public class TrapezoidalProfile {
                         mRisenState = currPos;
                         mRisingDeltaX = mRisenState - initialState;
                     }
-                    return right?maxAccel:-maxAccel;
+                    return positive?maxAccel:-maxAccel;
                 case FALL:
-                    return right?-maxAccel:maxAccel;
+                    return positive?-maxAccel:maxAccel;
                 case STEADY:
                     if ((currPos-mRisenState)+2*mRisingDeltaX>finalState-initialState) {
                         mShapeState = ShapeState.FALL;
