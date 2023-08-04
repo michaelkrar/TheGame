@@ -69,6 +69,11 @@ public class TheGame extends ApplicationAdapter {
 				boss.damage(10);
 			}
 		}
+		for (Bullet b : boss.bullets) {
+			if (player.linK.position().subtract(b.linK.position()).hypot()<20){
+				player.damage(10);
+			}
+		}
 		if(boss.mLK.position().subtract(player.linK.position()).hypot()<20){
 			player.damage(10);
 		}

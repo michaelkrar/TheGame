@@ -141,7 +141,7 @@ public class Player extends Entity {
 
     private void fireBullet () {
         if(bullets.size()<10&&TimeUtils.timeSinceMillis(timeLastBulletFired)>200){
-            bullets.add(new Bullet(pose));
+            bullets.add(new Bullet(pose,false));
             timeLastBulletFired=TimeUtils.millis();
         }
     }

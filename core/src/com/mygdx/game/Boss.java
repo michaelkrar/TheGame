@@ -8,8 +8,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.physics.LinearKinematics;
+import com.mygdx.physics.Pair;
 import com.mygdx.physics.Translation2d;
 import com.mygdx.physics.TrapezoidalProfile;
+import com.mygdx.physics.TrapezoidalProfile2d;
 import com.mygdx.physics.TrapezoidalProfile.Dimension;
 
 public class Boss extends Entity {
@@ -22,11 +24,14 @@ public class Boss extends Entity {
     public boolean mIsFightStateComplete;
     public LinearKinematics mLK;
     private TrapezoidalProfile mProfile;
+    private TrapezoidalProfile2d mProfile2d;
     private boolean startedProfile;
     private double setpoint;
     public ArrayList<Bullet> bullets;
     private long timeLastBulletFired;
     private boolean skyphase;
+    private int numSkyPhases;
+    private Translation2d setpoint2d;
     // public ShapeRenderer barDrawer;
     public Boss (Translation2d pose) {
         texture = new Texture("boss.png");
@@ -39,10 +44,13 @@ public class Boss extends Entity {
         timeLastHit = 0;
         mLK = new LinearKinematics(pose);
         mProfile = new TrapezoidalProfile(0, 0, 0,0, Dimension.X);
+        mProfile2d = new TrapezoidalProfile2d(mProfile,mProfile);
         setpoint = 250;
         bullets = new ArrayList<Bullet>();
         timeLastBulletFired=0;
         skyphase= false;
+        numSkyPhases = 0;
+        setpoint2d = new Translation2d();
         // barDrawer = new ShapeRenderer();
     }
     public void update () {
@@ -57,17 +65,29 @@ public class Boss extends Entity {
     }
     private void fireBullet () {
         if(bullets.size()<10&&TimeUtils.timeSinceMillis(timeLastBulletFired)>200){
-            bullets.add(new Bullet(pose));
+            bullets.add(new Bullet(mLK.position(),true));
             timeLastBulletFired=TimeUtils.millis();
         }
     }
     public void render (SpriteBatch batch) {
+        System.out.println(bullets.size());
+        for (Bullet b : bullets) {
+            if(!b.dead()){
+                b.update();
+            } else {
+                bullets.remove(b);
+                break;
+            }
+        }
         if(hp>0) {
             if(mImmuneState==ImmuneState.NONE){
                 batch.draw(texture, (float)mLK.position().x(), (float)mLK.position().y());
             } else {
                 batch.draw(shieldingText, (float)mLK.position().x(), (float)mLK.position().y());
             }
+        }
+        for(Bullet bullet : bullets) {
+            bullet.render(batch);
         }
         updateStates();
         handleFightState();
@@ -110,9 +130,11 @@ public class Boss extends Entity {
                     }
                 break;
             case SKY:
+                
                 setpoint = skyphase?50:400;
                 if(!startedProfile) {
                         System.out.println("started profile i have not");
+                        numSkyPhases++;
                         mProfile = new TrapezoidalProfile(10, 30, mLK.position().y(), setpoint, Dimension.X);
                         startedProfile = true;
                     } else if(!mProfile.isFinished(mLK)){
@@ -125,8 +147,25 @@ public class Boss extends Entity {
                         mFightState = FightState.SKY;
                         skyphase=skyphase?false:true;
                     }
+                    if(numSkyPhases>5){
+                    startedProfile=false;
+                    mFightState=FightState.ZIGZAG;
+                }
                     fireBullet();
                 break;
+            case ZIGZAG:
+                setpoint2d = new Translation2d(400,50);
+                if(!startedProfile) {
+                    mProfile2d = new TrapezoidalProfile2d(new Pair<Double,Double>(5.0,5.0), new Pair<Double,Double>(5.0,5.0), mLK.position(), setpoint2d);
+                    startedProfile=true;
+                } else if (!mProfile.isFinished(mLK)) {
+                    mLK.setAcceleration(mProfile2d.getAccel(mLK));
+                } else {
+                    mLK.setVelocity(new Translation2d());
+                    mLK.setAcceleration(new Translation2d());
+                    startedProfile = false;
+                    mFightState = FightState.GETHIGH;
+                }
             case UNKNOWN:
                 break;
             default:
@@ -148,6 +187,7 @@ public class Boss extends Entity {
         GROUNDRUSH,
         UNKNOWN,
         DEAD,
+        ZIGZAG,
     }
     public enum ImmuneState {
         ALL,

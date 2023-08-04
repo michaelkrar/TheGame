@@ -12,6 +12,7 @@ public class TrapezoidalProfile {
     private double mRisenState;
     private double currVel;
     private double currPos;
+    private boolean right;
     public TrapezoidalProfile (double maxAccel, double maxVel, double initialState, double finalState, Dimension dim) {
         this.maxAccel = maxAccel;
         this.maxVel = maxVel;
@@ -22,6 +23,7 @@ public class TrapezoidalProfile {
         mRisingDeltaX=0;
         mRisenState = 0;
         currVel = 0;
+        right = finalState-initialState>0?true:false;
     }
     public double getAccel (LinearKinematics lk) {
             // if (lk.velocity().x()<maxVel) {
@@ -43,9 +45,9 @@ public class TrapezoidalProfile {
                         mRisenState = currPos;
                         mRisingDeltaX = mRisenState - initialState;
                     }
-                    return maxAccel;
+                    return right?maxAccel:-maxAccel;
                 case FALL:
-                    return -maxAccel;
+                    return right?-maxAccel:maxAccel;
                 case STEADY:
                     if ((currPos-mRisenState)+2*mRisingDeltaX>finalState-initialState) {
                         mShapeState = ShapeState.FALL;
@@ -59,10 +61,13 @@ public class TrapezoidalProfile {
 
     public boolean isFinished (LinearKinematics lk) {
         if(Math.abs(currPos-finalState)<errorAccept){
-            mShapeState = ShapeState.DEAD;
+            kill();
             return true;
         }
         return false;
+    }
+    public void kill () {
+        mShapeState = ShapeState.DEAD;
     }
     public enum Dimension {
         X,
